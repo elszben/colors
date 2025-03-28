@@ -140,7 +140,7 @@
     }
 
     .turn-entry .color-box {
-      flex: 0 0 90%;
+      flex: 0 0 100%;
       height: 120px;
       border-radius: 6px;
     }
@@ -208,6 +208,27 @@
       border: 1px solid #000;
       border-radius: 4px;
     }
+
+    .color-box {
+      width: 100%;
+      height: 120px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      position: relative;
+      overflow: hidden;
+      /* hide overflow if label sticks out */
+    }
+
+    .color-label {
+      position: absolute;
+      bottom: 8px;
+      left: 12px;
+      font-size: 32px;
+      font-weight: bold;
+      color: white;
+      text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+      pointer-events: none;
+    }
   </style>
 
 </head>
@@ -217,12 +238,14 @@
   <div class="info">
     <div class="color-row">
       <div class="color-column">
-        <div class="ryb-label">Target</div>
-        <div class="color-box" id="targetColor"></div>
+        <div class="color-box" id="targetColor">
+          <span class="color-label">Target</span>
+        </div>
       </div>
       <div class="color-column">
-        <div class="ryb-label">Start</div>
-        <div class="color-box" id="currentColor"></div>
+        <div class="color-box" id="currentColor">
+          <span class="color-label">Start</span>
+        </div>
       </div>
     </div>
     <div class="color-picker-wrapper">
@@ -279,11 +302,10 @@
 
       entry.appendChild(resultBox);
 
-      const percentage = document.createElement("div");
-      percentage.className = "percentage";
-      percentage.textContent = `${percent}%`;
-
-      entry.appendChild(percentage);
+      const label = document.createElement("span");
+      label.className = "color-label";
+      label.textContent = `${percent}%`;
+      resultBox.appendChild(label);
       turnHistory.appendChild(entry);
 
       updateDisplay();
@@ -388,6 +410,9 @@
       const popup = document.getElementById("rybPopup");
 
       popup.innerHTML = ""; // clear previous content
+      popup.style.left = event.pageX + 10 + "px";
+      popup.style.top = event.pageY + 10 + "px";
+      popup.style.display = "block";
 
       // === RGB section ===
       const rgbTitle = document.createElement("div");
@@ -447,10 +472,6 @@
         bar.appendChild(label);
         popup.appendChild(bar);
       });
-
-      popup.style.left = event.pageX + 10 + "px";
-      popup.style.top = event.pageY + 10 + "px";
-      popup.style.display = "block";
 
       const cmykTitle = document.createElement("div");
       cmykTitle.style.fontWeight = "bold";
