@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>RYB Color Mixing Game</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+
+    .color-row {
+      display: flex;
+      margin-bottom: 10px;
+    }
+
+    .color-box {
+      flex: 1;
+      height: 100px;
+    }
+
+    .info {
+      margin-bottom: 20px;
+    }
+
+    .turn-history {
+      margin-top: 20px;
+    }
+
+    .turn-entry {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .turn-entry .color-box {
+      height: 50px;
+    }
+
+    .percentage {
+      margin-left: 10px;
+      min-width: 80px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🎨 RYB Color Mixing Game</h1>
+
+  <div class="info">
+    <div class="color-row">
+      <div id="targetColor" class="color-box"></div>
+      <div id="currentColor" class="color-box"></div>
+    </div>
+    <div>
+      <label for="colorPicker">Pick a color:</label>
+      <input type="color" id="colorPicker" />
+      <button id="mixButton">Mix</button>
+    </div>
+    <p>Turn: <span id="turnCount">0</span>/6</p>
+  </div>
+
+  <div class="turn-history" id="turnHistory">
+    <h2>History</h2>
+  </div>
+
+  <script>
+    const targetBox = document.getElementById("targetColor");
+    const currentBox = document.getElementById("currentColor");
+    const colorPicker = document.getElementById("colorPicker");
+    const mixButton = document.getElementById("mixButton");
+    const turnCountSpan = document.getElementById("turnCount");
+    const turnHistory = document.getElementById("turnHistory");
+
+    let turn = 0;
+    const maxTurns = 6;
+
+    let targetColor = randomColor();
+    let currentColor = randomColor();
+
+    updateDisplay();
+
+    mixButton.addEventListener("click", () => {
+      if (turn >= maxTurns) return;
+
+      const pickedColor = hexToRgb(colorPicker.value);
+      currentColor = mixColors(currentColor, pickedColor);
+      turn++;
+
+      const distance = colorDistance(currentColor, targetColor);
+      const percent = Math.round((1 - distance) * 100);
+
+      const entry = document.createElement("div");
+      entry.className = "turn-entry";
+
+      const resultBox = document.createElement("div");
+      resultBox.className = "color-box";
+      resultBox.style.backgroundColor = rgbToHex(currentColor);
+
+      const percentage = document.createElement("div");
+      percentage.className = "percentage";
+      percentage.textContent = `${percent}% match`;
+
+      const rybBars = document.createElement("div");
+      rybBars.style.display = "flex";
+      rybBars.style.flexDirection = "column";
+      rybBars.style.marginLeft = "10px";
+      rybBars.style.fontSize = "0.9em";
+
+      const ryb = approximateRYB(currentColor);
+
+      const components = [
+        { name: "R", value: ryb.r, color: "red" },
+        { name: "Y", value: ryb.y, color: "gold" },
+        { name: "B", value: ryb.b, color: "blue" }
+      ];
+
+      components.forEach(comp => {
+        const bar = document.createElement("div");
+        bar.style.display = "flex";
+        bar.style.alignItems = "center";
+        bar.style.marginBottom = "2px";
+
+        const colorRect = document.createElement("div");
+        colorRect.style.width = "20px";
+        colorRect.style.height = "20px";
+        colorRect.style.backgroundColor = comp.color;
+        colorRect.style.marginRight = "6px";
+        colorRect.style.border = "1px solid #000";
+
+        const label = document.createElement("div");
+        label.textContent = `${comp.name}: ${Math.round(comp.value)}%`;
+
+        bar.appendChild(colorRect);
+        bar.appendChild(label);
+        rybBars.appendChild(bar);
+      });
+
+      entry.appendChild(resultBox);
+      entry.appendChild(percentage);
+      entry.appendChild(rybBars);
+      turnHistory.appendChild(entry);
+
+      updateDisplay();
+
+      if (turn === maxTurns) {
+        alert(`Game over! You reached ${percent}% similarity.`);
+      }
+    });
+
+    function updateDisplay() {
+      targetBox.style.backgroundColor = rgbToHex(targetColor);
+      currentBox.style.backgroundColor = rgbToHex(currentColor);
+      turnCountSpan.textContent = turn;
+    }
+
+    function mixColors(c1, c2) {
+      return {
+        r: Math.floor((c1.r + c2.r) / 2),
+        g: Math.floor((c1.g + c2.g) / 2),
+        b: Math.floor((c1.b + c2.b) / 2)
+      };
+    }
+
+    function rgbToHex({ r, g, b }) {
+      return `#${[r, g, b].map(x => x.toString(16).padStart(2, "0")).join("")}`;
+    }
+
+    function hexToRgb(hex) {
+      const bigint = parseInt(hex.slice(1), 16);
+      return {
+        r: (bigint >> 16) & 255,
+        g: (bigint >> 8) & 255,
+        b: bigint & 255
+      };
+    }
+
+    function colorDistance(c1, c2) {
+      const dr = c1.r - c2.r;
+      const dg = c1.g - c2.g;
+      const db = c1.b - c2.b;
+      return Math.sqrt(dr * dr + dg * dg + db * db) / Math.sqrt(3 * 255 * 255);
+    }
+
+    function randomColor() {
+      return {
+        r: Math.floor(Math.random() * 256),
+        g: Math.floor(Math.random() * 256),
+        b: Math.floor(Math.random() * 256)
+      };
+    }
+
+    // Approximate RYB decomposition from RGB
+    function approximateRYB({ r, g, b }) {
+      const rf = r / 255;
+      const gf = g / 255;
+      const bf = b / 255;
+
+      const red = Math.max(0, rf - bf * 0.5 - gf * 0.5);
+      const yellow = Math.min(rf, gf);
+      const blue = Math.max(0, bf - rf * 0.3 - gf * 0.3);
+
+      const total = red + yellow + blue || 1;
+
+      return {
+        r: (red / total) * 100,
+        y: (yellow / total) * 100,
+        b: (blue / total) * 100
+      };
+    }
+  </script>
+</body>
+
+</html>
