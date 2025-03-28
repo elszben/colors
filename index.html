@@ -14,22 +14,20 @@
       margin: 0;
       padding: 0;
       font-family: sans-serif;
-      height: 100%;
       width: 100%;
+      height: 100%;
       background: #fafafa;
     }
 
     body {
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
       align-items: center;
-      padding: 1rem;
     }
 
     h1 {
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
+      font-size: 24px;
+      margin: 0.5rem 0;
       text-align: center;
     }
 
@@ -40,7 +38,7 @@
       gap: 16px;
       margin-bottom: 16px;
       width: 100%;
-      max-width: 600px;
+      padding: 0 16px;
     }
 
     .color-column {
@@ -59,87 +57,102 @@
 
     .ryb-label {
       font-weight: bold;
-      margin: 6px 0 4px;
+      font-size: 16px;
+      margin: 8px 0 4px;
     }
 
     .info {
       width: 100%;
-      max-width: 600px;
       display: flex;
       flex-direction: column;
       align-items: center;
+      padding: 0 16px;
+    }
+
+    .info label {
+      font-size: 16px;
+      margin-bottom: 8px;
     }
 
     .info input[type="color"] {
       width: 100%;
-      max-width: 300px;
-      height: 50px;
+      height: 48px;
       border: none;
-      margin-top: 0.5rem;
-      margin-bottom: 0.5rem;
+      font-size: 16px;
+      margin-bottom: 16px;
     }
 
     #mixButton {
       padding: 10px 20px;
-      font-size: 1rem;
-      margin-bottom: 1rem;
+      font-size: 18px;
+      margin-bottom: 16px;
       cursor: pointer;
     }
 
     .turn-history {
       width: 100%;
-      max-width: 600px;
-      margin-top: 1rem;
+      padding: 0 16px;
+    }
+
+    .turn-history h2 {
+      font-size: 20px;
+      margin-bottom: 12px;
     }
 
     .turn-entry {
       display: flex;
       align-items: stretch;
-      gap: 10px;
-      margin-bottom: 10px;
-      padding: 0.5rem;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding: 12px;
       background: white;
       border: 1px solid #ddd;
       border-radius: 8px;
     }
 
     .turn-entry .color-box {
-      flex: 1;
+      flex: 0 0 80%;
       height: 100px;
       border-radius: 6px;
     }
 
+
     .percentage {
-      margin-left: 10px;
       font-weight: bold;
-      min-width: 80px;
+      font-size: 16px;
+      margin-top: 8px;
     }
 
     .ryb-bars {
       display: flex;
       flex-direction: column;
-      margin-left: 10px;
-      font-size: 0.9em;
+      font-size: 16px;
     }
 
     .ryb-bar {
       display: flex;
       align-items: center;
-      margin-bottom: 2px;
+      margin-bottom: 4px;
     }
 
     .ryb-bar div:first-child {
       width: 20px;
       height: 20px;
-      margin-right: 6px;
+      margin-right: 8px;
       border: 1px solid #000;
-      border-radius: 3px;
+      border-radius: 4px;
+    }
+
+    p {
+      font-size: 16px;
+      margin-top: 0;
     }
   </style>
+
 </head>
 
 <body>
-  <h1>🎨 RYB Color Mixing Game</h1>
+  <h1>RYB Color Mixing Game</h1>
 
   <div class="info">
     <div class="color-row">
@@ -237,8 +250,16 @@
       });
 
       entry.appendChild(resultBox);
-      entry.appendChild(percentage);
-      entry.appendChild(rybBars);
+
+      const infoColumn = document.createElement("div");
+      infoColumn.style.display = "flex";
+      infoColumn.style.flexDirection = "column";
+      infoColumn.style.justifyContent = "space-between";
+
+      infoColumn.appendChild(rybBars);
+      infoColumn.appendChild(percentage);
+
+      entry.appendChild(infoColumn);
       turnHistory.appendChild(entry);
 
       updateDisplay();
