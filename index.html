@@ -309,7 +309,7 @@
       const percent = Math.round((1 - distance) * 100);
 
       const entry = document.createElement("div");
-      entry.className = "turn-entry";
+      entry.className = "turn-entry slide-in-left";
 
       const resultBox = document.createElement("div");
       resultBox.className = "color-box";
@@ -321,9 +321,6 @@
       const label = document.createElement("span");
       label.className = "color-label";
       label.textContent = `${percent}%`;
-
-      // Add fade-in class
-      setTimeout(() => resultBox.classList.add("slide-in-left"), 0);
 
       resultBox.appendChild(label);
       turnHistory.appendChild(entry);
