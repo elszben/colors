@@ -5,44 +5,119 @@
   <meta charset="UTF-8" />
   <title>RYB Color Mixing Game</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
     body {
+      margin: 0;
+      padding: 0;
       font-family: sans-serif;
-      padding: 20px;
-      max-width: 600px;
-      margin: auto;
+      height: 100%;
+      width: 100%;
+      background: #fafafa;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 1rem;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      text-align: center;
     }
 
     .color-row {
       display: flex;
-      margin-bottom: 10px;
+      width: 100%;
+      max-width: 600px;
+      height: 120px;
+      margin-bottom: 1rem;
+      border-radius: 10px;
+      overflow: hidden;
     }
 
     .color-box {
       flex: 1;
-      height: 100px;
     }
 
     .info {
-      margin-bottom: 20px;
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .info input[type="color"] {
+      width: 100%;
+      max-width: 300px;
+      height: 50px;
+      border: none;
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    #mixButton {
+      padding: 10px 20px;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      cursor: pointer;
     }
 
     .turn-history {
-      margin-top: 20px;
+      width: 100%;
+      max-width: 600px;
+      margin-top: 1rem;
     }
 
     .turn-entry {
       display: flex;
       align-items: center;
       margin-bottom: 10px;
+      padding: 0.5rem;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
     }
 
     .turn-entry .color-box {
-      height: 50px;
+      width: 60px;
+      height: 60px;
+      border-radius: 6px;
     }
 
     .percentage {
       margin-left: 10px;
+      font-weight: bold;
       min-width: 80px;
+    }
+
+    .ryb-bars {
+      display: flex;
+      flex-direction: column;
+      margin-left: 10px;
+      font-size: 0.9em;
+    }
+
+    .ryb-bar {
+      display: flex;
+      align-items: center;
+      margin-bottom: 2px;
+    }
+
+    .ryb-bar div:first-child {
+      width: 20px;
+      height: 20px;
+      margin-right: 6px;
+      border: 1px solid #000;
+      border-radius: 3px;
     }
   </style>
 </head>
@@ -105,10 +180,7 @@
       percentage.textContent = `${percent}% match`;
 
       const rybBars = document.createElement("div");
-      rybBars.style.display = "flex";
-      rybBars.style.flexDirection = "column";
-      rybBars.style.marginLeft = "10px";
-      rybBars.style.fontSize = "0.9em";
+      rybBars.className = "ryb-bars";
 
       const ryb = approximateRYB(currentColor);
 
@@ -120,9 +192,7 @@
 
       components.forEach(comp => {
         const bar = document.createElement("div");
-        bar.style.display = "flex";
-        bar.style.alignItems = "center";
-        bar.style.marginBottom = "2px";
+        bar.className = "ryb-bar";
 
         const colorRect = document.createElement("div");
         colorRect.style.width = "20px";
