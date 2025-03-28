@@ -99,6 +99,12 @@
       display: block;
     }
 
+    .mix-button-wrapper {
+      width: 100%;
+      padding: 0 16px;
+      margin-bottom: 20px;
+    }
+
     #mixButton {
       width: 100%;
       padding: 16px;
@@ -106,7 +112,7 @@
       font-weight: bold;
       margin-bottom: 20px;
       cursor: pointer;
-      background-color: #333;
+      background-color: #6209d6;
       color: white;
       border: none;
       border-radius: 8px;
@@ -169,6 +175,13 @@
       font-size: 16px;
       margin-top: 0;
     }
+
+    #targetRYB,
+    #startRYB {
+      flex-direction: row;
+      justify-content: center;
+      gap: 12px;
+    }
   </style>
 
 </head>
@@ -193,7 +206,9 @@
       <label for="colorPicker">Pick a color:</label>
       <input type="color" id="colorPicker" />
     </div>
-    <button id="mixButton">Mix</button>
+    <div class="mix-button-wrapper">
+      <button id="mixButton">Mix</button>
+    </div>
     <p>Turn: <span id="turnCount">0</span>/6</p>
   </div>
 
