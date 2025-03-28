@@ -140,14 +140,14 @@
     }
 
     .turn-entry .color-box {
-      flex: 0 0 80%;
+      flex: 0 0 90%;
       height: 120px;
       border-radius: 6px;
     }
 
     .percentage {
       font-weight: bold;
-      font-size: 32px;
+      font-size: 39px;
       margin-top: 8px;
     }
 
@@ -182,24 +182,47 @@
       justify-content: center;
       gap: 12px;
     }
+
+    #rybPopup {
+      position: absolute;
+      background: white;
+      border: 2px solid #333;
+      border-radius: 10px;
+      padding: 16px;
+      font-size: 36px;
+      /* ⬅️ Much larger text */
+      z-index: 1000;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    #rybPopup .ryb-bar {
+      display: flex;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    #rybPopup .ryb-bar div:first-child {
+      width: 24px;
+      height: 24px;
+      margin-right: 10px;
+      border: 1px solid #000;
+      border-radius: 4px;
+    }
   </style>
 
 </head>
+<div id="rybPopup" style="display:none;"></div>
 
 <body>
-  <h1>RYB Color Mixing Game</h1>
-
   <div class="info">
     <div class="color-row">
       <div class="color-column">
-        <div class="color-box" id="targetColor"></div>
         <div class="ryb-label">Target</div>
-        <div id="targetRYB" class="ryb-bars"></div>
+        <div class="color-box" id="targetColor"></div>
       </div>
       <div class="color-column">
-        <div class="color-box" id="currentColor"></div>
         <div class="ryb-label">Start</div>
-        <div id="startRYB" class="ryb-bars"></div>
+        <div class="color-box" id="currentColor"></div>
       </div>
     </div>
     <div class="color-picker-wrapper">
@@ -228,14 +251,19 @@
 
     updateDisplay();
 
-    updateRYBBars("targetRYB", targetColor, "Target");
-    updateRYBBars("startRYB", currentColor, "Start");
+    document.addEventListener("click", (e) => {
+      const popup = document.getElementById("rybPopup");
+      if (!popup.contains(e.target) && e.target.tagName !== "DIV") {
+        popup.style.display = "none";
+      }
+    });
 
     mixButton.addEventListener("click", () => {
       if (turn >= maxTurns) return;
 
       const pickedColor = hexToRgb(colorPicker.value);
-      currentColor = mixColors(currentColor, pickedColor);
+      const mixedColor = mixColors(currentColor, pickedColor);
+      currentColor = mixedColor;
       turn++;
 
       const distance = colorDistance(currentColor, targetColor);
@@ -246,53 +274,16 @@
 
       const resultBox = document.createElement("div");
       resultBox.className = "color-box";
-      resultBox.style.backgroundColor = rgbToHex(currentColor);
-
-      const percentage = document.createElement("div");
-      percentage.className = "percentage";
-      percentage.textContent = `${percent}% match`;
-
-      const rybBars = document.createElement("div");
-      rybBars.className = "ryb-bars";
-
-      const ryb = approximateRYB(currentColor);
-
-      const components = [
-        { name: "R", value: ryb.r, color: "red" },
-        { name: "Y", value: ryb.y, color: "gold" },
-        { name: "B", value: ryb.b, color: "blue" }
-      ];
-
-      components.forEach(comp => {
-        const bar = document.createElement("div");
-        bar.className = "ryb-bar";
-
-        const colorRect = document.createElement("div");
-        colorRect.style.width = "20px";
-        colorRect.style.height = "20px";
-        colorRect.style.backgroundColor = comp.color;
-        colorRect.style.marginRight = "6px";
-        colorRect.style.border = "1px solid #000";
-
-        const label = document.createElement("div");
-        label.textContent = `${comp.name}: ${Math.round(comp.value)}%`;
-
-        bar.appendChild(colorRect);
-        bar.appendChild(label);
-        rybBars.appendChild(bar);
-      });
+      resultBox.style.backgroundColor = rgbToHex(mixedColor);
+      resultBox.onclick = (e) => showRYBPopup(mixedColor, e);
 
       entry.appendChild(resultBox);
 
-      const infoColumn = document.createElement("div");
-      infoColumn.style.display = "flex";
-      infoColumn.style.flexDirection = "column";
-      infoColumn.style.justifyContent = "space-between";
+      const percentage = document.createElement("div");
+      percentage.className = "percentage";
+      percentage.textContent = `${percent}%`;
 
-      infoColumn.appendChild(rybBars);
-      infoColumn.appendChild(percentage);
-
-      entry.appendChild(infoColumn);
+      entry.appendChild(percentage);
       turnHistory.appendChild(entry);
 
       updateDisplay();
@@ -305,6 +296,9 @@
     function updateDisplay() {
       targetBox.style.backgroundColor = rgbToHex(targetColor);
       currentBox.style.backgroundColor = rgbToHex(currentColor);
+
+      targetBox.onclick = (e) => showRYBPopup(targetColor, e);
+      currentBox.onclick = (e) => showRYBPopup(currentColor, e);
     }
 
     function mixColors(c1, c2) {
@@ -388,6 +382,125 @@
         container.appendChild(bar);
       });
     }
+
+    function showRYBPopup(color, event) {
+      const ryb = approximateRYB(color);
+      const popup = document.getElementById("rybPopup");
+
+      popup.innerHTML = ""; // clear previous content
+
+      // === RGB section ===
+      const rgbTitle = document.createElement("div");
+      rgbTitle.style.fontWeight = "bold";
+      rgbTitle.style.marginBottom = "10px";
+      rgbTitle.textContent = "RGB";
+
+      popup.appendChild(rgbTitle);
+
+      const rgbComponents = [
+        { name: "R", value: (color.r / 255) * 100, color: "red" },
+        { name: "G", value: (color.g / 255) * 100, color: "green" },
+        { name: "B", value: (color.b / 255) * 100, color: "blue" }
+      ];
+
+      rgbComponents.forEach(comp => {
+        const bar = document.createElement("div");
+        bar.className = "ryb-bar";
+
+        const rect = document.createElement("div");
+        rect.style.backgroundColor = comp.color;
+
+        const label = document.createElement("div");
+        label.textContent = `${comp.name}: ${Math.round(comp.value)}%`;
+
+        bar.appendChild(rect);
+        bar.appendChild(label);
+        popup.appendChild(bar);
+      });
+
+      // === RYB section ===
+      const rybTitle = document.createElement("div");
+      rybTitle.style.fontWeight = "bold";
+      rybTitle.style.marginTop = "20px";
+      rybTitle.style.marginBottom = "10px";
+      rybTitle.textContent = "RYB";
+
+      popup.appendChild(rybTitle);
+
+      const rybComponents = [
+        { name: "R", value: ryb.r, color: "red" },
+        { name: "Y", value: ryb.y, color: "gold" },
+        { name: "B", value: ryb.b, color: "blue" }
+      ];
+
+      rybComponents.forEach(comp => {
+        const bar = document.createElement("div");
+        bar.className = "ryb-bar";
+
+        const rect = document.createElement("div");
+        rect.style.backgroundColor = comp.color;
+
+        const label = document.createElement("div");
+        label.textContent = `${comp.name}: ${Math.round(comp.value)}%`;
+
+        bar.appendChild(rect);
+        bar.appendChild(label);
+        popup.appendChild(bar);
+      });
+
+      popup.style.left = event.pageX + 10 + "px";
+      popup.style.top = event.pageY + 10 + "px";
+      popup.style.display = "block";
+
+      const cmykTitle = document.createElement("div");
+      cmykTitle.style.fontWeight = "bold";
+      cmykTitle.style.marginTop = "20px";
+      cmykTitle.style.marginBottom = "10px";
+      cmykTitle.textContent = "CMYK";
+      const cmyk = rgbToCmyk(color);
+      const cmykComponents = [
+        { name: "C", value: cmyk.c, color: "cyan" },
+        { name: "M", value: cmyk.m, color: "magenta" },
+        { name: "Y", value: cmyk.y, color: "gold" },
+        { name: "K", value: cmyk.k, color: "black" }
+      ];
+
+      popup.appendChild(cmykTitle);
+
+      cmykComponents.forEach(comp => {
+        const bar = document.createElement("div");
+        bar.className = "ryb-bar";
+
+        const rect = document.createElement("div");
+        rect.style.backgroundColor = comp.color;
+
+        const label = document.createElement("div");
+        label.textContent = `${comp.name}: ${Math.round(comp.value)}%`;
+
+        bar.appendChild(rect);
+        bar.appendChild(label);
+        popup.appendChild(bar);
+      });
+    }
+
+    function rgbToCmyk({ r, g, b }) {
+      const rf = r / 255;
+      const gf = g / 255;
+      const bf = b / 255;
+
+      const k = 1 - Math.max(rf, gf, bf);
+      const c = k < 1 ? (1 - rf - k) / (1 - k) : 0;
+      const m = k < 1 ? (1 - gf - k) / (1 - k) : 0;
+      const y = k < 1 ? (1 - bf - k) / (1 - k) : 0;
+
+      return {
+        c: c * 100,
+        m: m * 100,
+        y: y * 100,
+        k: k * 100
+      };
+    }
+
   </script>
 </body>
 
